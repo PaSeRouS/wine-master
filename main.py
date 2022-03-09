@@ -1,24 +1,27 @@
+import argparse
 import collections
 from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from pprint import pprint
 
 import pandas
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
 if __name__ == '__main__':
-    now = datetime.now()
-    years_from_foundation = now.year - 1920
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--filename", default='products.xlsx')
+    args = parser.parse_args()
 
-    excel_data = pandas.read_excel('wine.xlsx', sheet_name='Лист1', keep_default_na=False)
-    wines = excel_data.to_dict(orient='records')
+    current_year = datetime.now().year
+    winery_age = current_year - 1920
 
-    collection_of_wine = collections.defaultdict(list)
+    products = pandas.read_excel(args.filename, sheet_name='Лист1', keep_default_na=False).to_dict(orient='records')
 
-    for wine in wines:
-        wine['Цена'] = int(wine['Цена'])
-        collection_of_wine[wine['Категория']].append(wine)
+    collection_of_products = collections.defaultdict(list)
+
+    for product in products:
+        product['Цена'] = int(product['Цена'])
+        collection_of_products[product['Категория']].append(product)
 
     env = Environment(
         loader=FileSystemLoader('.'),
@@ -28,8 +31,8 @@ if __name__ == '__main__':
     template = env.get_template('template.html')
 
     rendered_page = template.render(
-        years_from_foundation=years_from_foundation,
-        wines=collection_of_wine,
+        winery_age=winery_age,
+        collection_of_products=collection_of_products,
     )
 
     with open('index.html', 'w', encoding="utf8") as file:
