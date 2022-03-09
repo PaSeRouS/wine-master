@@ -9,13 +9,13 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--filename", default='products.xlsx')
+    parser.add_argument("--filepath", default='products.xlsx')
     args = parser.parse_args()
 
     current_year = datetime.now().year
     winery_age = current_year - 1920
 
-    products = pandas.read_excel(args.filename, sheet_name='Лист1', keep_default_na=False).to_dict(orient='records')
+    products = pandas.read_excel(args.filepath, sheet_name='Лист1', keep_default_na=False).to_dict(orient='records')
 
     collection_of_products = collections.defaultdict(list)
 
